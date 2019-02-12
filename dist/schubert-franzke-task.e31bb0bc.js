@@ -71356,29 +71356,19 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml').then(function (r
         var marker = new _Feature.default({
           geometry: new _Point.default(element.geometry.coordinates),
           id: element.id
-        }); // creating marker style
-
-        var markerStyle = new _style.Style({
-          image: new _style.Circle({
-            radius: 7,
-            fill: new _style.Fill({
-              color: 'blue'
-            })
-          })
         }); // adding id attribute of every pharmacy store to every marker
 
-        marker.setId(element.id); // Here below, I have left commented code which I used for adding marker icons. I am not sure why it's
-        // not working so I just left Point geometry with circle style.
-        // let markerStyle = new Style({
-        //   image: new Icon( ({
-        //     anchor: [0.5, 46],
-        //     anchorXUnits: 'fraction',
-        //     anchorYUnits: 'pixels',
-        //     src: 'marker.png'
-        //   }))
-        // });
-        // marker.setStyle(markerStyle);
-        // adding markers to vector source and then source to the layer
+        marker.setId(element.id); // creating marker style
+
+        var markerStyle = new _style.Style({
+          image: new _style.Icon({
+            anchor: [0.5, 46],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            src: 'marker.png'
+          })
+        });
+        marker.setStyle(markerStyle); // adding markers to vector source and then source to the layer
 
         var vectorSource = new _source.Vector({
           features: [marker]
@@ -71455,7 +71445,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57949" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52086" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

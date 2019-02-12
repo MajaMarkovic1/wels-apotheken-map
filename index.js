@@ -59,32 +59,20 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml')
               geometry: new Point(element.geometry.coordinates),
               id: element.id
             });
-            // creating marker style
-            let markerStyle = new Style({
-              image: new Circle(({
-                  radius: 7,
-                  fill: new Fill({
-                    color: 'blue'
-                  })
-              }))
-            });
             // adding id attribute of every pharmacy store to every marker
             marker.setId(element.id);
 
-            // Here below, I have left commented code which I used for adding marker icons. I am not sure why it's
-            // not working so I just left Point geometry with circle style.
-
-            // let markerStyle = new Style({
-            //   image: new Icon( ({
-            //     anchor: [0.5, 46],
-            //     anchorXUnits: 'fraction',
-            //     anchorYUnits: 'pixels',
-            //     src: 'marker.png'
-            //   }))
-            // });
-            // marker.setStyle(markerStyle);
+            // creating marker style
+            let markerStyle = new Style({
+              image: new Icon( ({
+                anchor: [0.5, 46],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                src: 'marker.png'
+              }))
+            });
+            marker.setStyle(markerStyle);
         
-
             // adding markers to vector source and then source to the layer
             let vectorSource = new VectorSource({
                 features: [marker]

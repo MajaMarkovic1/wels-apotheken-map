@@ -71343,13 +71343,64 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml').then(function (r
       center: (0, _proj.fromLonLat)([14.0282, 48.1635]),
       zoom: 13
     })
-  }); // getting pharmacy list data with AJAX
+  });
+  fetch('https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&folder=7344').then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    var pharmacies = data.Wels.folder.items;
+    pharmacies.forEach(function (element) {
+      // creating marker for each pharmacy using their coordinates from json file
+      var marker = new _Feature.default({
+        geometry: new _Point.default(element.geometry.coordinates),
+        id: element.id
+      }); // adding id attribute of every pharmacy store to every marker
 
-  $.ajax({
-    type: 'GET',
-    url: 'https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&folder=7344',
-    dataType: 'json',
-    success: function success(data) {
+      marker.setId(element.id); // creating marker style
+
+      var markerStyle = new _style.Style({
+        image: new _style.Icon({
+          anchor: [0.5, 46],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          src: 'marker.png'
+        })
+      });
+      marker.setStyle(markerStyle); // adding markers to vector source and then source to the layer
+
+      var vectorSource = new _source.Vector({
+        features: [marker]
+      });
+      var vectorLayer = new _layer.Vector({
+        source: vectorSource,
+        style: markerStyle
+      });
+      map.addLayer(vectorLayer);
+    });
+  }); // creating popup overlay and adding to map
+
+  var popup = new _Overlay.default({
+    element: document.getElementById('popup')
+  });
+  map.addOverlay(popup); // when clicked closer (X) on popup window it closes
+
+  closer.addEventListener('click', function () {
+    popup.setPosition(undefined);
+    closer.blur();
+  });
+  map.addEventListener('click', function (evt) {
+    // detecting features that intersect a pixel on the view and execute a callback with each intersecting feature
+    var feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+      return feature;
+    });
+
+    if (feature) {
+      // getting feature coordinates (coordinates of pharmacy that's been clicked)
+      var coordinates = feature.getGeometry().getCoordinates(); // setting popup window above the clicked pharmacy
+
+      popup.setPosition(coordinates); // getting name, info and other attributes of each pharmacy object, using AJAX
+      // object id in url is got from feature's (marker's) id attribute set earlier
+      // each click on marker sends single GET request for the corresponding object (pharmacy) 
+
       var pharmacies = data.Wels.folder.items;
       pharmacies.forEach(function (element) {
         // creating marker for each pharmacy using their coordinates from json file
@@ -71379,41 +71430,11 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml').then(function (r
         });
         map.addLayer(vectorLayer);
       });
-    }
-  }); // creating popup overlay and adding to map
-
-  var popup = new _Overlay.default({
-    element: document.getElementById('popup')
-  });
-  map.addOverlay(popup); // when clicked closer (X) on popup window it closes
-
-  closer.addEventListener('click', function () {
-    popup.setPosition(undefined);
-    closer.blur();
-  });
-  map.addEventListener('click', function (evt) {
-    // detecting features that intersect a pixel on the view and execute a callback with each intersecting feature
-    var feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-      return feature;
-    });
-
-    if (feature) {
-      // getting feature coordinates (coordinates of pharmacy that's been clicked)
-      var coordinates = feature.getGeometry().getCoordinates(); // setting popup window above the clicked pharmacy
-
-      popup.setPosition(coordinates); // getting name, info and other attributes of each pharmacy object, using AJAX
-      // object id in url is got from feature's (marker's) id attribute set earlier
-      // each click on marker sends single GET request for the corresponding object (pharmacy) 
-
-      $.ajax({
-        type: 'GET',
-        url: "https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&object=".concat(feature.id_),
-        dataType: 'json',
-        success: function success(data) {
-          // getting data for each pharmacy and displaying it in popup window
-          var object = data.Wels.object;
-          content.innerHTML = "<p><b>".concat(object.name, "</b></p>\n              <p>Telefon: ").concat(object.contact.tel1, "</p>\n              <p>").concat(object.info, "</p>");
-        }
+      fetch("https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&object=".concat(feature.id_)).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        var object = data.Wels.object;
+        content.innerHTML = "<p><b>".concat(object.name, "</b></p>\n              <p>Telefon: ").concat(object.contact.tel1, "</p>\n              <p>").concat(object.info, "</p>");
       });
     }
   });

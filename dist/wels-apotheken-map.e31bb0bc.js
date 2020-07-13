@@ -5,8 +5,6 @@
 //
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
-
-// eslint-disable-next-line no-global-assign
 parcelRequire = (function (modules, cache, entry, globalName) {
   // Save the require from previous bundle to this closure if any
   var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
@@ -77,8 +75,16 @@ parcelRequire = (function (modules, cache, entry, globalName) {
     }, {}];
   };
 
+  var error;
   for (var i = 0; i < entry.length; i++) {
-    newRequire(entry[i]);
+    try {
+      newRequire(entry[i]);
+    } catch (e) {
+      // Save first error but execute all entries
+      if (!error) {
+        error = e;
+      }
+    }
   }
 
   if (entry.length) {
@@ -103,6 +109,13 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   // Override the current require with this new one
+  parcelRequire = newRequire;
+
+  if (error) {
+    // throw error from earlier, _after updating parcelRequire_
+    throw error;
+  }
+
   return newRequire;
 })({"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
@@ -120,7 +133,7 @@ function getBundleURL() {
   try {
     throw new Error();
   } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
 
     if (matches) {
       return getBaseURL(matches[0]);
@@ -131,7 +144,7 @@ function getBundleURL() {
 }
 
 function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
 }
 
 exports.getBundleURL = getBundleURLCached;
@@ -260,7 +273,7 @@ function getUid(obj) {
  */
 
 
-var VERSION = '5.3.0';
+var VERSION = '5.3.3';
 exports.VERSION = VERSION;
 },{}],"node_modules/ol/AssertionError.js":[function(require,module,exports) {
 "use strict";
@@ -281,9 +294,7 @@ var _util = require("./util.js");
  * extended with a `code` property.
  * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error.
  */
-var AssertionError =
-/*@__PURE__*/
-function (Error) {
+var AssertionError = /*@__PURE__*/function (Error) {
   function AssertionError(code) {
     var path = _util.VERSION === 'latest' ? _util.VERSION : 'v' + _util.VERSION.split('-')[0];
     var message = 'Assertion failed. See https://openlayers.org/en/' + path + '/doc/errors/#' + code + ' for details.';
@@ -977,9 +988,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    more listeners after this one will be called. Same as when the listener
  *    returns false.
  */
-var Target =
-/*@__PURE__*/
-function (Disposable) {
+var Target = /*@__PURE__*/function (Disposable) {
   function Target() {
     Disposable.call(this);
     /**
@@ -1214,9 +1223,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires import("./events/Event.js").Event
  * @api
  */
-var Observable =
-/*@__PURE__*/
-function (EventTarget) {
+var Observable = /*@__PURE__*/function (EventTarget) {
   function Observable() {
     EventTarget.call(this);
     /**
@@ -1379,9 +1386,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @classdesc
  * Events emitted by {@link module:ol/Object~BaseObject} instances are instances of this type.
  */
-var ObjectEvent =
-/*@__PURE__*/
-function (Event) {
+var ObjectEvent = /*@__PURE__*/function (Event) {
   function ObjectEvent(type, key, oldValue) {
     Event.call(this, type);
     /**
@@ -1453,9 +1458,7 @@ function (Event) {
 
 exports.ObjectEvent = ObjectEvent;
 
-var BaseObject =
-/*@__PURE__*/
-function (Observable) {
+var BaseObject = /*@__PURE__*/function (Observable) {
   function BaseObject(opt_values) {
     Observable.call(this); // Call {@link module:ol/util~getUid} to ensure that the order of objects' ids is
     // the same as the order in which they were created.  This also helps to
@@ -1635,9 +1638,7 @@ var Property = {
  * type.
  */
 
-var CollectionEvent =
-/*@__PURE__*/
-function (Event) {
+var CollectionEvent = /*@__PURE__*/function (Event) {
   function CollectionEvent(type, opt_element) {
     Event.call(this, type);
     /**
@@ -1677,9 +1678,7 @@ function (Event) {
 
 exports.CollectionEvent = CollectionEvent;
 
-var Collection =
-/*@__PURE__*/
-function (BaseObject) {
+var Collection = /*@__PURE__*/function (BaseObject) {
   function Collection(opt_array, opt_options) {
     BaseObject.call(this);
     var options = opt_options || {};
@@ -1963,7 +1962,9 @@ var _EventType = _interopRequireDefault(require("./events/EventType.js"));
 
 var _Object = _interopRequireWildcard(require("./Object.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2023,9 +2024,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Feature =
-/*@__PURE__*/
-function (BaseObject) {
+var Feature = /*@__PURE__*/function (BaseObject) {
   function Feature(opt_geometryOrProperties) {
     BaseObject.call(this);
     /**
@@ -4643,9 +4642,7 @@ var WORLD_EXTENT = [-180, -85, 180, 85];
 
 exports.WORLD_EXTENT = WORLD_EXTENT;
 
-var EPSG3857Projection =
-/*@__PURE__*/
-function (Projection) {
+var EPSG3857Projection = /*@__PURE__*/function (Projection) {
   function EPSG3857Projection(code) {
     Projection.call(this, {
       code: code,
@@ -4798,9 +4795,7 @@ var METERS_PER_UNIT = Math.PI * RADIUS / 180;
 
 exports.METERS_PER_UNIT = METERS_PER_UNIT;
 
-var EPSG4326Projection =
-/*@__PURE__*/
-function (Projection) {
+var EPSG4326Projection = /*@__PURE__*/function (Projection) {
   function EPSG4326Projection(code, opt_axisOrientation) {
     Projection.call(this, {
       code: code,
@@ -5020,7 +5015,9 @@ var projections = _interopRequireWildcard(require("./proj/projections.js"));
 
 var _transforms = require("./proj/transforms.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5828,9 +5825,7 @@ var tmpTransform = (0, _transform2.create)();
  * @api
  */
 
-var Geometry =
-/*@__PURE__*/
-function (BaseObject) {
+var Geometry = /*@__PURE__*/function (BaseObject) {
   function Geometry() {
     BaseObject.call(this);
     /**
@@ -6131,9 +6126,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @abstract
  * @api
  */
-var SimpleGeometry =
-/*@__PURE__*/
-function (Geometry) {
+var SimpleGeometry = /*@__PURE__*/function (Geometry) {
   function SimpleGeometry() {
     Geometry.call(this);
     /**
@@ -7433,9 +7426,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var LinearRing =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var LinearRing = /*@__PURE__*/function (SimpleGeometry) {
   function LinearRing(coordinates, opt_layout) {
     SimpleGeometry.call(this);
     /**
@@ -7595,9 +7586,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Point =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var Point = /*@__PURE__*/function (SimpleGeometry) {
   function Point(coordinates, opt_layout) {
     SimpleGeometry.call(this);
     this.setCoordinates(coordinates, opt_layout);
@@ -8405,9 +8394,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Polygon =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var Polygon = /*@__PURE__*/function (SimpleGeometry) {
   function Polygon(coordinates, opt_layout, opt_ends) {
     SimpleGeometry.call(this);
     /**
@@ -9255,7 +9242,7 @@ var CANVAS_LINE_DASH = function () {
 
 
 exports.CANVAS_LINE_DASH = CANVAS_LINE_DASH;
-var GEOLOCATION = 'geolocation' in navigator;
+var GEOLOCATION = ('geolocation' in navigator);
 /**
  * True if browser supports touch events.
  * @const
@@ -9264,7 +9251,7 @@ var GEOLOCATION = 'geolocation' in navigator;
  */
 
 exports.GEOLOCATION = GEOLOCATION;
-var TOUCH = 'ontouchstart' in window;
+var TOUCH = ('ontouchstart' in window);
 /**
  * True if browser supports pointer events.
  * @const
@@ -9272,7 +9259,7 @@ var TOUCH = 'ontouchstart' in window;
  */
 
 exports.TOUCH = TOUCH;
-var POINTER = 'PointerEvent' in window;
+var POINTER = ('PointerEvent' in window);
 /**
  * True if browser supports ms pointer events (IE 10).
  * @const
@@ -9308,7 +9295,9 @@ var _proj = require("./proj.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /**
  * @module ol/Geolocation
@@ -9334,9 +9323,7 @@ var Property = {
  * Events emitted on Geolocation error.
  */
 
-var GeolocationError =
-/*@__PURE__*/
-function (Event) {
+var GeolocationError = /*@__PURE__*/function (Event) {
   function GeolocationError(error) {
     Event.call(this, _EventType.default.ERROR);
     /**
@@ -9391,9 +9378,7 @@ function (Event) {
  */
 
 
-var Geolocation =
-/*@__PURE__*/
-function (BaseObject) {
+var Geolocation = /*@__PURE__*/function (BaseObject) {
   function Geolocation(opt_options) {
     BaseObject.call(this);
     var options = opt_options || {};
@@ -10483,9 +10468,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var LineString =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var LineString = /*@__PURE__*/function (SimpleGeometry) {
   function LineString(coordinates, opt_layout) {
     SimpleGeometry.call(this);
     /**
@@ -12936,9 +12919,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @abstract
  */
-var ImageBase =
-/*@__PURE__*/
-function (EventTarget) {
+var ImageBase = /*@__PURE__*/function (EventTarget) {
   function ImageBase(extent, resolution, pixelRatio, state) {
     EventTarget.call(this);
     /**
@@ -13099,9 +13080,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @typedef {function(ImageWrapper, string)} LoadFunction
  * @api
  */
-var ImageWrapper =
-/*@__PURE__*/
-function (ImageBase) {
+var ImageWrapper = /*@__PURE__*/function (ImageBase) {
   function ImageWrapper(extent, resolution, pixelRatio, src, crossOrigin, imageLoadFunction) {
     ImageBase.call(this, extent, resolution, pixelRatio, _ImageState.default.IDLE);
     /**
@@ -13248,9 +13227,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @typedef {function(function(Error=))} Loader
  */
-var ImageCanvas =
-/*@__PURE__*/
-function (ImageBase) {
+var ImageCanvas = /*@__PURE__*/function (ImageBase) {
   function ImageCanvas(extent, resolution, pixelRatio, canvas, opt_loader) {
     var state = opt_loader !== undefined ? _ImageState.default.IDLE : _ImageState.default.LOADED;
     ImageBase.call(this, extent, resolution, pixelRatio, state);
@@ -13520,9 +13497,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @abstract
  */
-var Tile =
-/*@__PURE__*/
-function (EventTarget) {
+var Tile = /*@__PURE__*/function (EventTarget) {
   function Tile(tileCoord, state, opt_options) {
     EventTarget.call(this);
     var options = opt_options ? opt_options : {};
@@ -13885,9 +13860,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/ImageTile
  */
-var ImageTile =
-/*@__PURE__*/
-function (Tile) {
+var ImageTile = /*@__PURE__*/function (Tile) {
   function ImageTile(tileCoord, state, src, crossOrigin, tileLoadFunction, opt_options) {
     Tile.call(this, tileCoord, state, opt_options);
     /**
@@ -14210,9 +14183,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Events emitted as map events are instances of this type.
  * See {@link module:ol/PluggableMap~PluggableMap} for which events trigger a map event.
  */
-var MapEvent =
-/*@__PURE__*/
-function (Event) {
+var MapEvent = /*@__PURE__*/function (Event) {
   function MapEvent(type, map, opt_frameState) {
     Event.call(this, type);
     /**
@@ -14260,9 +14231,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Events emitted as map browser events are instances of this type.
  * See {@link module:ol/PluggableMap~PluggableMap} for which events trigger a map browser event.
  */
-var MapBrowserEvent =
-/*@__PURE__*/
-function (MapEvent) {
+var MapBrowserEvent = /*@__PURE__*/function (MapEvent) {
   function MapBrowserEvent(type, map, browserEvent, opt_dragging, opt_frameState) {
     MapEvent.call(this, type, map, opt_frameState);
     /**
@@ -14411,9 +14380,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/MapBrowserPointerEvent
  */
-var MapBrowserPointerEvent =
-/*@__PURE__*/
-function (MapBrowserEvent) {
+var MapBrowserPointerEvent = /*@__PURE__*/function (MapBrowserEvent) {
   function MapBrowserPointerEvent(type, map, pointerEvent, opt_dragging, opt_frameState) {
     MapBrowserEvent.call(this, type, map, pointerEvent.originalEvent, opt_dragging, opt_frameState);
     /**
@@ -14650,9 +14617,7 @@ function mouseout(inEvent) {
   }
 }
 
-var MouseSource =
-/*@__PURE__*/
-function (EventSource) {
+var MouseSource = /*@__PURE__*/function (EventSource) {
   function MouseSource(dispatcher) {
     var mapping = {
       'mousedown': mousedown,
@@ -14920,9 +14885,7 @@ function msGotPointerCapture(inEvent) {
   this.dispatcher.dispatchEvent(e);
 }
 
-var MsSource =
-/*@__PURE__*/
-function (EventSource) {
+var MsSource = /*@__PURE__*/function (EventSource) {
   function MsSource(dispatcher) {
     var mapping = {
       'MSPointerDown': msPointerDown,
@@ -15112,9 +15075,7 @@ function gotPointerCapture(inEvent) {
   this.dispatcher.fireNativeEvent(inEvent);
 }
 
-var NativeSource =
-/*@__PURE__*/
-function (EventSource) {
+var NativeSource = /*@__PURE__*/function (EventSource) {
   function NativeSource(dispatcher) {
     var mapping = {
       'pointerdown': pointerDown,
@@ -15187,9 +15148,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var HAS_BUTTONS = false;
 
-var PointerEvent =
-/*@__PURE__*/
-function (_Event) {
+var PointerEvent = /*@__PURE__*/function (_Event) {
   function PointerEvent(type, originalEvent, opt_eventDict) {
     _Event.call(this, type);
     /**
@@ -15535,9 +15494,7 @@ function touchcancel(inEvent) {
   this.processTouches_(inEvent, this.cancelOut_);
 }
 
-var TouchSource =
-/*@__PURE__*/
-function (EventSource) {
+var TouchSource = /*@__PURE__*/function (EventSource) {
   function TouchSource(dispatcher, mouseSource) {
     var mapping = {
       'touchstart': touchstart,
@@ -15920,7 +15877,9 @@ var _PointerEvent = _interopRequireDefault(require("./PointerEvent.js"));
 
 var _TouchSource = _interopRequireDefault(require("./TouchSource.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15966,9 +15925,7 @@ var CLONE_PROPS = [// MouseEvent
 ['pointerId', 0], ['width', 0], ['height', 0], ['pressure', 0], ['tiltX', 0], ['tiltY', 0], ['pointerType', ''], ['hwTimestamp', 0], ['isPrimary', false], // event instance
 ['type', ''], ['target', null], ['currentTarget', null], ['which', 0]];
 
-var PointerEventHandler =
-/*@__PURE__*/
-function (EventTarget) {
+var PointerEventHandler = /*@__PURE__*/function (EventTarget) {
   function PointerEventHandler(element) {
     EventTarget.call(this);
     /**
@@ -16357,9 +16314,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/MapBrowserEventHandler
  */
-var MapBrowserEventHandler =
-/*@__PURE__*/
-function (EventTarget) {
+var MapBrowserEventHandler = /*@__PURE__*/function (EventTarget) {
   function MapBrowserEventHandler(map, moveTolerance) {
     EventTarget.call(this);
     /**
@@ -17029,9 +16984,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @typedef {function(import("./Tile.js").default, string, import("./coordinate.js").Coordinate, number): number} PriorityFunction
  */
-var TileQueue =
-/*@__PURE__*/
-function (PriorityQueue) {
+var TileQueue = /*@__PURE__*/function (PriorityQueue) {
   function TileQueue(tilePriorityFunction, tileChangeCallback) {
     PriorityQueue.call(
     /**
@@ -17708,9 +17661,7 @@ var DEFAULT_MIN_ZOOM = 0;
   * @api
  */
 
-var View =
-/*@__PURE__*/
-function (BaseObject) {
+var View = /*@__PURE__*/function (BaseObject) {
   function View(opt_options) {
     BaseObject.call(this);
     var options = (0, _obj.assign)({}, opt_options);
@@ -18997,9 +18948,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var BaseLayer =
-/*@__PURE__*/
-function (BaseObject) {
+var BaseLayer = /*@__PURE__*/function (BaseObject) {
   function BaseLayer(options) {
     BaseObject.call(this);
     /**
@@ -19347,9 +19296,7 @@ var Property = {
  * @api
  */
 
-var LayerGroup =
-/*@__PURE__*/
-function (BaseLayer) {
+var LayerGroup = /*@__PURE__*/function (BaseLayer) {
   function LayerGroup(opt_options) {
     var options = opt_options || {};
     var baseOptions =
@@ -19693,7 +19640,9 @@ var _PriorityQueue = require("./structs/PriorityQueue.js");
 
 var _transform = require("./transform.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19805,9 +19754,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires module:ol/render/Event~RenderEvent#rendercomplete
  * @api
  */
-var PluggableMap =
-/*@__PURE__*/
-function (BaseObject) {
+var PluggableMap = /*@__PURE__*/function (BaseObject) {
   function PluggableMap(options) {
     BaseObject.call(this);
     var optionsInternal = createOptionsInternal(options);
@@ -20729,7 +20676,7 @@ function (BaseObject) {
 
       if (!this.handleResize_) {
         this.handleResize_ = this.updateSize.bind(this);
-        addEventListener(_EventType2.default.RESIZE, this.handleResize_, false);
+        window.addEventListener(_EventType2.default.RESIZE, this.handleResize_, false);
       }
     }
 
@@ -21226,9 +21173,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Control =
-/*@__PURE__*/
-function (BaseObject) {
+var Control = /*@__PURE__*/function (BaseObject) {
   function Control(options) {
     BaseObject.call(this);
     /**
@@ -21521,9 +21466,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @fires import("../render/Event.js").RenderEvent
  */
-var Layer =
-/*@__PURE__*/
-function (BaseLayer) {
+var Layer = /*@__PURE__*/function (BaseLayer) {
   function Layer(options) {
     var baseOptions = (0, _obj.assign)({}, options);
     delete baseOptions.source;
@@ -21768,9 +21711,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Attribution =
-/*@__PURE__*/
-function (Control) {
+var Attribution = /*@__PURE__*/function (Control) {
   function Attribution(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -22120,9 +22061,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Rotate =
-/*@__PURE__*/
-function (Control) {
+var Rotate = /*@__PURE__*/function (Control) {
   function Rotate(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -22318,9 +22257,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Zoom =
-/*@__PURE__*/
-function (Control) {
+var Zoom = /*@__PURE__*/function (Control) {
   function Zoom(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -22559,9 +22496,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * vectors and so are visible on the screen.
  * @api
  */
-var Interaction =
-/*@__PURE__*/
-function (BaseObject) {
+var Interaction = /*@__PURE__*/function (BaseObject) {
   function Interaction(options) {
     BaseObject.call(this);
 
@@ -22795,7 +22730,9 @@ var _MapBrowserEventType = _interopRequireDefault(require("../MapBrowserEventTyp
 
 var _Interaction = _interopRequireWildcard(require("./Interaction.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22814,9 +22751,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Allows the user to zoom by double-clicking on the map.
  * @api
  */
-var DoubleClickZoom =
-/*@__PURE__*/
-function (Interaction) {
+var DoubleClickZoom = /*@__PURE__*/function (Interaction) {
   function DoubleClickZoom(opt_options) {
     Interaction.call(this, {
       handleEvent: handleEvent
@@ -23217,9 +23152,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * user function is called and returns `false`.
  * @api
  */
-var PointerInteraction =
-/*@__PURE__*/
-function (Interaction) {
+var PointerInteraction = /*@__PURE__*/function (Interaction) {
   function PointerInteraction(opt_options) {
     var options = opt_options ? opt_options : {};
     Interaction.call(
@@ -23438,7 +23371,9 @@ var _functions = require("../functions.js");
 
 var _Pointer = _interopRequireWildcard(require("./Pointer.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23459,9 +23394,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Allows the user to pan the map by dragging the map.
  * @api
  */
-var DragPan =
-/*@__PURE__*/
-function (PointerInteraction) {
+var DragPan = /*@__PURE__*/function (PointerInteraction) {
   function DragPan(opt_options) {
     PointerInteraction.call(this, {
       stopDown: _functions.FALSE
@@ -23663,9 +23596,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * This interaction is only supported for mouse devices.
  * @api
  */
-var DragRotate =
-/*@__PURE__*/
-function (PointerInteraction) {
+var DragRotate = /*@__PURE__*/function (PointerInteraction) {
   function DragRotate(opt_options) {
     var options = opt_options ? opt_options : {};
     PointerInteraction.call(this, {
@@ -23781,9 +23712,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/Box
  */
-var RenderBox =
-/*@__PURE__*/
-function (Disposable) {
+var RenderBox = /*@__PURE__*/function (Disposable) {
   function RenderBox(className) {
     Disposable.call(this);
     /**
@@ -23988,9 +23917,7 @@ var DragBoxEventType = {
  * this type.
  */
 
-var DragBoxEvent =
-/*@__PURE__*/
-function (Event) {
+var DragBoxEvent = /*@__PURE__*/function (Event) {
   function DragBoxEvent(type, coordinate, mapBrowserEvent) {
     Event.call(this, type);
     /**
@@ -24031,9 +23958,7 @@ function (Event) {
  */
 
 
-var DragBox =
-/*@__PURE__*/
-function (PointerInteraction) {
+var DragBox = /*@__PURE__*/function (PointerInteraction) {
   function DragBox(opt_options) {
     PointerInteraction.call(this);
     var options = opt_options ? opt_options : {};
@@ -24206,9 +24131,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * your custom one configured with `className`.
  * @api
  */
-var DragZoom =
-/*@__PURE__*/
-function (DragBox) {
+var DragZoom = /*@__PURE__*/function (DragBox) {
   function DragZoom(opt_options) {
     var options = opt_options ? opt_options : {};
     var condition = options.condition ? options.condition : _condition.shiftKeyOnly;
@@ -24313,7 +24236,9 @@ var _condition = require("../events/condition.js");
 
 var _Interaction = _interopRequireWildcard(require("./Interaction.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24346,9 +24271,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * See also {@link module:ol/interaction/KeyboardZoom~KeyboardZoom}.
  * @api
  */
-var KeyboardPan =
-/*@__PURE__*/
-function (Interaction) {
+var KeyboardPan = /*@__PURE__*/function (Interaction) {
   function KeyboardPan(opt_options) {
     Interaction.call(this, {
       handleEvent: handleEvent
@@ -24452,7 +24375,9 @@ var _condition = require("../events/condition.js");
 
 var _Interaction = _interopRequireWildcard(require("./Interaction.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24483,9 +24408,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * See also {@link module:ol/interaction/KeyboardPan~KeyboardPan}.
  * @api
  */
-var KeyboardZoom =
-/*@__PURE__*/
-function (Interaction) {
+var KeyboardZoom = /*@__PURE__*/function (Interaction) {
   function KeyboardZoom(opt_options) {
     Interaction.call(this, {
       handleEvent: handleEvent
@@ -24572,7 +24495,9 @@ var _Interaction = _interopRequireWildcard(require("./Interaction.js"));
 
 var _math = require("../math.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24617,9 +24542,7 @@ var Mode = {
 
 exports.Mode = Mode;
 
-var MouseWheelZoom =
-/*@__PURE__*/
-function (Interaction) {
+var MouseWheelZoom = /*@__PURE__*/function (Interaction) {
   function MouseWheelZoom(opt_options) {
     var options = opt_options ? opt_options : {};
     Interaction.call(
@@ -24915,7 +24838,9 @@ var _Pointer = _interopRequireWildcard(require("./Pointer.js"));
 
 var _rotationconstraint = require("../rotationconstraint.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24936,9 +24861,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * on a touch screen.
  * @api
  */
-var PinchRotate =
-/*@__PURE__*/
-function (PointerInteraction) {
+var PinchRotate = /*@__PURE__*/function (PointerInteraction) {
   function PinchRotate(opt_options) {
     var options = opt_options ? opt_options : {};
     var pointerOptions =
@@ -25101,7 +25024,9 @@ var _Interaction = require("./Interaction.js");
 
 var _Pointer = _interopRequireWildcard(require("./Pointer.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25122,9 +25047,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * on a touch screen.
  * @api
  */
-var PinchZoom =
-/*@__PURE__*/
-function (PointerInteraction) {
+var PinchZoom = /*@__PURE__*/function (PointerInteraction) {
   function PinchZoom(opt_options) {
     var options = opt_options ? opt_options : {};
     var pointerOptions =
@@ -25326,9 +25249,7 @@ var DragAndDropEventType = {
  * of this type.
  */
 
-var DragAndDropEvent =
-/*@__PURE__*/
-function (Event) {
+var DragAndDropEvent = /*@__PURE__*/function (Event) {
   function DragAndDropEvent(type, file, opt_features, opt_projection) {
     Event.call(this, type);
     /**
@@ -25368,9 +25289,7 @@ function (Event) {
  */
 
 
-var DragAndDrop =
-/*@__PURE__*/
-function (Interaction) {
+var DragAndDrop = /*@__PURE__*/function (Interaction) {
   function DragAndDrop(opt_options) {
     var options = opt_options ? opt_options : {};
     Interaction.call(this, {
@@ -25591,9 +25510,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * And this interaction is not included in the default interactions.
  * @api
  */
-var DragRotateAndZoom =
-/*@__PURE__*/
-function (PointerInteraction) {
+var DragRotateAndZoom = /*@__PURE__*/function (PointerInteraction) {
   function DragRotateAndZoom(opt_options) {
     var options = opt_options ? opt_options : {};
     PointerInteraction.call(
@@ -25742,9 +25659,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var Circle =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var Circle = /*@__PURE__*/function (SimpleGeometry) {
   function Circle(center, opt_radius, opt_layout) {
     SimpleGeometry.call(this);
 
@@ -26036,9 +25951,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var MultiLineString =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var MultiLineString = /*@__PURE__*/function (SimpleGeometry) {
   function MultiLineString(coordinates, opt_layout, opt_ends) {
     SimpleGeometry.call(this);
     /**
@@ -26344,9 +26257,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var MultiPoint =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var MultiPoint = /*@__PURE__*/function (SimpleGeometry) {
   function MultiPoint(coordinates, opt_layout) {
     SimpleGeometry.call(this);
 
@@ -26613,9 +26524,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var MultiPolygon =
-/*@__PURE__*/
-function (SimpleGeometry) {
+var MultiPolygon = /*@__PURE__*/function (SimpleGeometry) {
   function MultiPolygon(coordinates, opt_layout, opt_endss) {
     SimpleGeometry.call(this);
     /**
@@ -27120,9 +27029,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires import("../events/Event.js").Event
  * @template T
  */
-var LRUCache =
-/*@__PURE__*/
-function (EventTarget) {
+var LRUCache = /*@__PURE__*/function (EventTarget) {
   function LRUCache(opt_highWaterMark) {
     EventTarget.call(this);
     /**
@@ -28188,9 +28095,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * `radius2` are provided.
  * @api
  */
-var RegularShape =
-/*@__PURE__*/
-function (ImageStyle) {
+var RegularShape = /*@__PURE__*/function (ImageStyle) {
   function RegularShape(options) {
     /**
      * @type {boolean}
@@ -28775,9 +28680,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Set circle style for vector features.
  * @api
  */
-var CircleStyle =
-/*@__PURE__*/
-function (RegularShape) {
+var CircleStyle = /*@__PURE__*/function (RegularShape) {
   function CircleStyle(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -29481,9 +29384,7 @@ var Property = {
  * @api
  */
 
-var VectorLayer =
-/*@__PURE__*/
-function (Layer) {
+var VectorLayer = /*@__PURE__*/function (Layer) {
   function VectorLayer(opt_options) {
     var options = opt_options ? opt_options :
     /** @type {Options} */
@@ -29985,9 +29886,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @abstract
  * @api
  */
-var Source =
-/*@__PURE__*/
-function (BaseObject) {
+var Source = /*@__PURE__*/function (BaseObject) {
   function Source(options) {
     BaseObject.call(this);
     /**
@@ -31145,9 +31044,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Events emitted by {@link module:ol/source/Vector} instances are instances of this
  * type.
  */
-var VectorSourceEvent =
-/*@__PURE__*/
-function (Event) {
+var VectorSourceEvent = /*@__PURE__*/function (Event) {
   function VectorSourceEvent(type, opt_feature) {
     Event.call(this, type);
     /**
@@ -31266,9 +31163,7 @@ function (Event) {
 
 exports.VectorSourceEvent = VectorSourceEvent;
 
-var VectorSource =
-/*@__PURE__*/
-function (Source) {
+var VectorSource = /*@__PURE__*/function (Source) {
   function VectorSource(opt_options) {
     var options = opt_options || {};
     Source.call(this, {
@@ -32203,7 +32098,9 @@ var _Vector2 = _interopRequireDefault(require("../source/Vector.js"));
 
 var _Style = require("../style/Style.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32328,9 +32225,7 @@ var DrawEventType = {
  * instances of this type.
  */
 
-var DrawEvent =
-/*@__PURE__*/
-function (Event) {
+var DrawEvent = /*@__PURE__*/function (Event) {
   function DrawEvent(type, feature) {
     Event.call(this, type);
     /**
@@ -32356,9 +32251,7 @@ function (Event) {
  */
 
 
-var Draw =
-/*@__PURE__*/
-function (PointerInteraction) {
+var Draw = /*@__PURE__*/function (PointerInteraction) {
   function Draw(options) {
     var pointerOptions =
     /** @type {import("./Pointer.js").Options} */
@@ -33418,9 +33311,7 @@ var ExtentEventType = {
  * instances of this type.
  */
 
-var ExtentInteractionEvent =
-/*@__PURE__*/
-function (Event) {
+var ExtentInteractionEvent = /*@__PURE__*/function (Event) {
   function ExtentInteractionEvent(extent) {
     Event.call(this, ExtentEventType.EXTENTCHANGED);
     /**
@@ -33448,9 +33339,7 @@ function (Event) {
  */
 
 
-var ExtentInteraction =
-/*@__PURE__*/
-function (PointerInteraction) {
+var ExtentInteraction = /*@__PURE__*/function (PointerInteraction) {
   function ExtentInteraction(opt_options) {
     var options = opt_options || {};
     PointerInteraction.call(
@@ -34004,9 +33893,7 @@ var ModifyEventType = {
  * instances of this type.
  */
 
-var ModifyEvent =
-/*@__PURE__*/
-function (Event) {
+var ModifyEvent = /*@__PURE__*/function (Event) {
   function ModifyEvent(type, features, mapBrowserPointerEvent) {
     Event.call(this, type);
     /**
@@ -34049,9 +33936,7 @@ function (Event) {
 
 exports.ModifyEvent = ModifyEvent;
 
-var Modify =
-/*@__PURE__*/
-function (PointerInteraction) {
+var Modify = /*@__PURE__*/function (PointerInteraction) {
   function Modify(options) {
     PointerInteraction.call(
     /** @type {import("./Pointer.js").Options} */
@@ -35390,9 +35275,7 @@ var SelectEventType = {
  * this type.
  */
 
-var SelectEvent =
-/*@__PURE__*/
-function (Event) {
+var SelectEvent = /*@__PURE__*/function (Event) {
   function SelectEvent(type, selected, deselected, mapBrowserEvent) {
     Event.call(this, type);
     /**
@@ -35440,9 +35323,7 @@ function (Event) {
  */
 
 
-var Select =
-/*@__PURE__*/
-function (Interaction) {
+var Select = /*@__PURE__*/function (Interaction) {
   function Select(opt_options) {
     Interaction.call(this, {
       handleEvent: handleEvent
@@ -35911,9 +35792,7 @@ function getFeatureFromEvent(evt) {
  */
 
 
-var Snap =
-/*@__PURE__*/
-function (PointerInteraction) {
+var Snap = /*@__PURE__*/function (PointerInteraction) {
   function Snap(opt_options) {
     var options = opt_options ? opt_options : {};
     var pointerOptions =
@@ -36598,9 +36477,7 @@ var TranslateEventType = {
  * are instances of this type.
  */
 
-var TranslateEvent =
-/*@__PURE__*/
-function (Event) {
+var TranslateEvent = /*@__PURE__*/function (Event) {
   function TranslateEvent(type, features, coordinate) {
     Event.call(this, type);
     /**
@@ -36636,9 +36513,7 @@ function (Event) {
 
 exports.TranslateEvent = TranslateEvent;
 
-var Translate =
-/*@__PURE__*/
-function (PointerInteraction) {
+var Translate = /*@__PURE__*/function (PointerInteraction) {
   function Translate(opt_options) {
     var options = opt_options ? opt_options : {};
     PointerInteraction.call(
@@ -37198,9 +37073,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/Event
  */
-var RenderEvent =
-/*@__PURE__*/
-function (Event) {
+var RenderEvent = /*@__PURE__*/function (Event) {
   function RenderEvent(type, opt_vectorContext, opt_frameState, opt_context, opt_glContext) {
     Event.call(this, type);
     /**
@@ -37420,9 +37293,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * {@link module:ol/render/Event~RenderEvent} object associated with postcompose, precompose and
  * render events emitted by layers and maps.
  */
-var CanvasImmediateRenderer =
-/*@__PURE__*/
-function (VectorContext) {
+var CanvasImmediateRenderer = /*@__PURE__*/function (VectorContext) {
   function CanvasImmediateRenderer(context, pixelRatio, extent, transform, viewRotation) {
     VectorContext.call(this);
     /**
@@ -38580,9 +38451,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @abstract
  */
-var MapRenderer =
-/*@__PURE__*/
-function (Disposable) {
+var MapRenderer = /*@__PURE__*/function (Disposable) {
   function MapRenderer(map) {
     Disposable.call(this);
     /**
@@ -38959,7 +38828,9 @@ var _Map = _interopRequireWildcard(require("../Map.js"));
 
 var _State = _interopRequireDefault(require("../../source/State.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38979,9 +38850,7 @@ var layerRendererConstructors = [];
 
 exports.layerRendererConstructors = layerRendererConstructors;
 
-var CanvasMapRenderer =
-/*@__PURE__*/
-function (MapRenderer) {
+var CanvasMapRenderer = /*@__PURE__*/function (MapRenderer) {
   function CanvasMapRenderer(map) {
     MapRenderer.call(this, map);
     var container = map.getViewport();
@@ -39209,9 +39078,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/renderer/Layer
  */
-var LayerRenderer =
-/*@__PURE__*/
-function (Observable) {
+var LayerRenderer = /*@__PURE__*/function (Observable) {
   function LayerRenderer(layer) {
     Observable.call(this);
     /**
@@ -39493,9 +39360,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @abstract
  */
-var CanvasLayerRenderer =
-/*@__PURE__*/
-function (LayerRenderer) {
+var CanvasLayerRenderer = /*@__PURE__*/function (LayerRenderer) {
   function CanvasLayerRenderer(layer) {
     LayerRenderer.call(this, layer);
     /**
@@ -39701,9 +39566,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @abstract
  */
-var IntermediateCanvasRenderer =
-/*@__PURE__*/
-function (CanvasLayerRenderer) {
+var IntermediateCanvasRenderer = /*@__PURE__*/function (CanvasLayerRenderer) {
   function IntermediateCanvasRenderer(layer) {
     CanvasLayerRenderer.call(this, layer);
     /**
@@ -39860,9 +39723,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Canvas renderer for image layers.
  * @api
  */
-var CanvasImageLayerRenderer =
-/*@__PURE__*/
-function (IntermediateCanvasRenderer) {
+var CanvasImageLayerRenderer = /*@__PURE__*/function (IntermediateCanvasRenderer) {
   function CanvasImageLayerRenderer(imageLayer) {
     IntermediateCanvasRenderer.call(this, imageLayer);
     /**
@@ -40251,9 +40112,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Canvas renderer for tile layers.
  * @api
  */
-var CanvasTileLayerRenderer =
-/*@__PURE__*/
-function (IntermediateCanvasRenderer) {
+var CanvasTileLayerRenderer = /*@__PURE__*/function (IntermediateCanvasRenderer) {
   function CanvasTileLayerRenderer(tileLayer, opt_noContext) {
     IntermediateCanvasRenderer.call(this, tileLayer);
     /**
@@ -40476,7 +40335,7 @@ function (IntermediateCanvasRenderer) {
           canvas.width = width;
           canvas.height = height;
         } else {
-          if (this.renderedExtent_ && !(0, _extent.equals)(imageExtent, this.renderedExtent_)) {
+          if (this.renderedExtent_ && !(0, _extent.equals)(imageExtent, this.renderedExtent_) || this.renderedRevision != sourceRevision) {
             context.clearRect(0, 0, width, height);
           }
 
@@ -40981,9 +40840,7 @@ var tmpExtent = (0, _extent.createEmpty)();
 
 var tmpTransform = (0, _transform2.create)();
 
-var CanvasReplay =
-/*@__PURE__*/
-function (VectorContext) {
+var CanvasReplay = /*@__PURE__*/function (VectorContext) {
   function CanvasReplay(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree) {
     VectorContext.call(this);
     /**
@@ -42234,9 +42091,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/canvas/ImageReplay
  */
-var CanvasImageReplay =
-/*@__PURE__*/
-function (CanvasReplay) {
+var CanvasImageReplay = /*@__PURE__*/function (CanvasReplay) {
   function CanvasImageReplay(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree) {
     CanvasReplay.call(this, tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree);
     /**
@@ -42444,14 +42299,14 @@ var _Replay = _interopRequireDefault(require("./Replay.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /**
  * @module ol/render/canvas/LineStringReplay
  */
-var CanvasLineStringReplay =
-/*@__PURE__*/
-function (CanvasReplay) {
+var CanvasLineStringReplay = /*@__PURE__*/function (CanvasReplay) {
   function CanvasLineStringReplay(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree) {
     CanvasReplay.call(this, tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree);
   }
@@ -42584,14 +42439,14 @@ var _Replay = _interopRequireDefault(require("./Replay.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /**
  * @module ol/render/canvas/PolygonReplay
  */
-var CanvasPolygonReplay =
-/*@__PURE__*/
-function (CanvasReplay) {
+var CanvasPolygonReplay = /*@__PURE__*/function (CanvasReplay) {
   function CanvasPolygonReplay(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree) {
     CanvasReplay.call(this, tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree);
   }
@@ -42908,9 +42763,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/canvas/TextReplay
  */
-var CanvasTextReplay =
-/*@__PURE__*/
-function (CanvasReplay) {
+var CanvasTextReplay = /*@__PURE__*/function (CanvasReplay) {
   function CanvasTextReplay(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree) {
     CanvasReplay.call(this, tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree);
     /**
@@ -43534,9 +43387,7 @@ var BATCH_CONSTRUCTORS = {
   'Text': _TextReplay.default
 };
 
-var CanvasReplayGroup =
-/*@__PURE__*/
-function (ReplayGroup) {
+var CanvasReplayGroup = /*@__PURE__*/function (ReplayGroup) {
   function CanvasReplayGroup(tolerance, maxExtent, resolution, pixelRatio, overlaps, declutterTree, opt_renderBuffer) {
     ReplayGroup.call(this);
     /**
@@ -44416,9 +44267,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Canvas renderer for vector layers.
  * @api
  */
-var CanvasVectorLayerRenderer =
-/*@__PURE__*/
-function (CanvasLayerRenderer) {
+var CanvasVectorLayerRenderer = /*@__PURE__*/function (CanvasLayerRenderer) {
   function CanvasVectorLayerRenderer(vectorLayer) {
     CanvasLayerRenderer.call(this, vectorLayer);
     /**
@@ -44930,7 +44779,9 @@ var _vector = require("../vector.js");
 
 var _transform = require("../../transform.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44960,9 +44811,7 @@ var VECTOR_REPLAYS = {
  * @api
  */
 
-var CanvasVectorTileLayerRenderer =
-/*@__PURE__*/
-function (CanvasTileLayerRenderer) {
+var CanvasVectorTileLayerRenderer = /*@__PURE__*/function (CanvasTileLayerRenderer) {
   function CanvasVectorTileLayerRenderer(layer) {
     CanvasTileLayerRenderer.call(this, layer, true);
     /**
@@ -45583,9 +45432,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires module:ol/render/Event~RenderEvent#precompose
  * @api
  */
-var Map =
-/*@__PURE__*/
-function (PluggableMap) {
+var Map = /*@__PURE__*/function (PluggableMap) {
   function Map(options) {
     options = (0, _obj.assign)({}, options);
 
@@ -45667,7 +45514,9 @@ var _events = require("./events.js");
 
 var _extent = require("./extent.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45756,9 +45605,7 @@ var Property = {
  * @api
  */
 
-var Overlay =
-/*@__PURE__*/
-function (BaseObject) {
+var Overlay = /*@__PURE__*/function (BaseObject) {
   function Overlay(options) {
     BaseObject.call(this);
     /**
@@ -46420,9 +46267,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/TileCache
  */
-var TileCache =
-/*@__PURE__*/
-function (LRUCache) {
+var TileCache = /*@__PURE__*/function (LRUCache) {
   function TileCache(opt_highWaterMark) {
     LRUCache.call(this, opt_highWaterMark);
   }
@@ -46512,9 +46357,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {number} renderedTileRevision
  * @property {number} renderedRevision
  */
-var VectorImageTile =
-/*@__PURE__*/
-function (Tile) {
+var VectorImageTile = /*@__PURE__*/function (Tile) {
   function VectorImageTile(tileCoord, state, sourceRevision, format, tileLoadFunction, urlTileCoord, tileUrlFunction, sourceTileGrid, tileGrid, sourceTiles, pixelRatio, projection, tileClass, handleTileChange, zoom) {
     Tile.call(this, tileCoord, state, {
       transition: 0
@@ -46848,9 +46691,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var DEFAULT_EXTENT = [0, 0, 4096, 4096];
 
-var VectorTile =
-/*@__PURE__*/
-function (Tile) {
+var VectorTile = /*@__PURE__*/function (Tile) {
   function VectorTile(tileCoord, state, src, format, tileLoadFunction, opt_options) {
     Tile.call(this, tileCoord, state, opt_options);
     /**
@@ -47162,9 +47003,7 @@ var getChangeType = function () {
  */
 
 
-var FullScreen =
-/*@__PURE__*/
-function (Control) {
+var FullScreen = /*@__PURE__*/function (Control) {
   function FullScreen(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -47450,9 +47289,7 @@ var COORDINATE_FORMAT = 'coordinateFormat';
  * @api
  */
 
-var MousePosition =
-/*@__PURE__*/
-function (Control) {
+var MousePosition = /*@__PURE__*/function (Control) {
   function MousePosition(opt_options) {
     var options = opt_options ? opt_options : {};
     var element = document.createElement('div');
@@ -47769,9 +47606,7 @@ var MIN_RATIO = 0.1;
  * @api
  */
 
-var OverviewMap =
-/*@__PURE__*/
-function (Control) {
+var OverviewMap = /*@__PURE__*/function (Control) {
   function OverviewMap(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -48357,9 +48192,7 @@ var LEADING_DIGITS = [1, 2, 5];
  * @api
  */
 
-var ScaleLine =
-/*@__PURE__*/
-function (Control) {
+var ScaleLine = /*@__PURE__*/function (Control) {
   function ScaleLine(opt_options) {
     var options = opt_options ? opt_options : {};
     var className = options.className !== undefined ? options.className : 'ol-scale-line';
@@ -48661,9 +48494,7 @@ var Direction = {
  * @api
  */
 
-var ZoomSlider =
-/*@__PURE__*/
-function (Control) {
+var ZoomSlider = /*@__PURE__*/function (Control) {
   function ZoomSlider(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -49046,9 +48877,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var ZoomToExtent =
-/*@__PURE__*/
-function (Control) {
+var ZoomToExtent = /*@__PURE__*/function (Control) {
   function ZoomToExtent(opt_options) {
     var options = opt_options ? opt_options : {};
     Control.call(this, {
@@ -49269,9 +49098,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/webgl/Fragment
  */
-var WebGLFragment =
-/*@__PURE__*/
-function (WebGLShader) {
+var WebGLFragment = /*@__PURE__*/function (WebGLShader) {
   function WebGLFragment(source) {
     WebGLShader.call(this, source);
   }
@@ -49309,9 +49136,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/webgl/Vertex
  */
-var WebGLVertex =
-/*@__PURE__*/
-function (WebGLShader) {
+var WebGLVertex = /*@__PURE__*/function (WebGLShader) {
   function WebGLVertex(source) {
     WebGLShader.call(this, source);
   }
@@ -49496,9 +49321,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/webgl/Replay
  */
-var WebGLReplay =
-/*@__PURE__*/
-function (VectorContext) {
+var WebGLReplay = /*@__PURE__*/function (VectorContext) {
   function WebGLReplay(tolerance, maxExtent) {
     VectorContext.call(this);
     /**
@@ -50047,9 +49870,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/webgl/CircleReplay
  */
-var WebGLCircleReplay =
-/*@__PURE__*/
-function (WebGLReplay) {
+var WebGLCircleReplay = /*@__PURE__*/function (WebGLReplay) {
   function WebGLCircleReplay(tolerance, maxExtent) {
     WebGLReplay.call(this, tolerance, maxExtent);
     /**
@@ -50610,9 +50431,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @classdesc
  * A WebGL context for accessing low-level WebGL capabilities.
  */
-var WebGLContext =
-/*@__PURE__*/
-function (Disposable) {
+var WebGLContext = /*@__PURE__*/function (Disposable) {
   function WebGLContext(canvas, gl) {
     Disposable.call(this);
     /**
@@ -50993,9 +50812,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/webgl/TextureReplay
  */
-var WebGLTextureReplay =
-/*@__PURE__*/
-function (WebGLReplay) {
+var WebGLTextureReplay = /*@__PURE__*/function (WebGLReplay) {
   function WebGLTextureReplay(tolerance, maxExtent) {
     WebGLReplay.call(this, tolerance, maxExtent);
     /**
@@ -51500,9 +51317,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/webgl/ImageReplay
  */
-var WebGLImageReplay =
-/*@__PURE__*/
-function (WebGLTextureReplay) {
+var WebGLImageReplay = /*@__PURE__*/function (WebGLTextureReplay) {
   function WebGLImageReplay(tolerance, maxExtent) {
     WebGLTextureReplay.call(this, tolerance, maxExtent);
     /**
@@ -51853,9 +51668,7 @@ var Instruction = {
   MITER_TOP: 23
 };
 
-var WebGLLineStringReplay =
-/*@__PURE__*/
-function (WebGLReplay) {
+var WebGLLineStringReplay = /*@__PURE__*/function (WebGLReplay) {
   function WebGLLineStringReplay(tolerance, maxExtent) {
     WebGLReplay.call(this, tolerance, maxExtent);
     /**
@@ -52875,9 +52688,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {PolygonVertex} p0
  * @property {PolygonVertex} p1
  */
-var WebGLPolygonReplay =
-/*@__PURE__*/
-function (WebGLReplay) {
+var WebGLPolygonReplay = /*@__PURE__*/function (WebGLReplay) {
   function WebGLPolygonReplay(tolerance, maxExtent) {
     WebGLReplay.call(this, tolerance, maxExtent);
     this.lineStringReplay = new _LineStringReplay.default(tolerance, maxExtent);
@@ -54496,9 +54307,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {Object<string, number>} width
  * @property {number} height
  */
-var WebGLTextReplay =
-/*@__PURE__*/
-function (WebGLTextureReplay) {
+var WebGLTextReplay = /*@__PURE__*/function (WebGLTextureReplay) {
   function WebGLTextReplay(tolerance, maxExtent) {
     WebGLTextureReplay.call(this, tolerance, maxExtent);
     /**
@@ -55026,9 +54835,7 @@ var BATCH_CONSTRUCTORS = {
   'Text': _TextReplay.default
 };
 
-var WebGLReplayGroup =
-/*@__PURE__*/
-function (ReplayGroup) {
+var WebGLReplayGroup = /*@__PURE__*/function (ReplayGroup) {
   function WebGLReplayGroup(tolerance, maxExtent, opt_renderBuffer) {
     ReplayGroup.call(this);
     /**
@@ -55328,9 +55135,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/render/webgl/Immediate
  */
-var WebGLImmediateRenderer =
-/*@__PURE__*/
-function (VectorContext) {
+var WebGLImmediateRenderer = /*@__PURE__*/function (VectorContext) {
   function WebGLImmediateRenderer(context, center, resolution, rotation, size, extent, pixelRatio) {
     VectorContext.call(this);
     /**
@@ -55867,9 +55672,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @abstract
  */
-var WebGLLayerRenderer =
-/*@__PURE__*/
-function (LayerRenderer) {
+var WebGLLayerRenderer = /*@__PURE__*/function (LayerRenderer) {
   function WebGLLayerRenderer(mapRenderer, layer) {
     LayerRenderer.call(this, layer);
     /**
@@ -56131,9 +55934,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * WebGL renderer for image layers.
  * @api
  */
-var WebGLImageLayerRenderer =
-/*@__PURE__*/
-function (WebGLLayerRenderer) {
+var WebGLImageLayerRenderer = /*@__PURE__*/function (WebGLLayerRenderer) {
   function WebGLImageLayerRenderer(mapRenderer, imageLayer) {
     WebGLLayerRenderer.call(this, mapRenderer, imageLayer);
     /**
@@ -56415,7 +56216,9 @@ var _Context = _interopRequireDefault(require("../../webgl/Context.js"));
 
 var _ContextEventType = _interopRequireDefault(require("../../webgl/ContextEventType.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56441,9 +56244,7 @@ var WEBGL_TEXTURE_CACHE_HIGH_WATER_MARK = 1024;
  * @api
  */
 
-var WebGLMapRenderer =
-/*@__PURE__*/
-function (MapRenderer) {
+var WebGLMapRenderer = /*@__PURE__*/function (MapRenderer) {
   function WebGLMapRenderer(map) {
     MapRenderer.call(this, map);
     var container = map.getViewport();
@@ -57019,7 +56820,9 @@ var _size = require("../size.js");
 
 var _tilecoord = require("../tilecoord.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /**
  * @module ol/tilegrid/TileGrid
@@ -57810,9 +57613,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @abstract
  * @api
  */
-var TileSource =
-/*@__PURE__*/
-function (Source) {
+var TileSource = /*@__PURE__*/function (Source) {
   function TileSource(options) {
     Source.call(this, {
       attributions: options.attributions,
@@ -58119,9 +57920,7 @@ function (Source) {
  */
 
 
-var TileSourceEvent =
-/*@__PURE__*/
-function (Event) {
+var TileSourceEvent = /*@__PURE__*/function (Event) {
   function TileSourceEvent(type, tile) {
     Event.call(this, type);
     /**
@@ -58257,9 +58056,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * WebGL renderer for tile layers.
  * @api
  */
-var WebGLTileLayerRenderer =
-/*@__PURE__*/
-function (WebGLLayerRenderer) {
+var WebGLTileLayerRenderer = /*@__PURE__*/function (WebGLLayerRenderer) {
   function WebGLTileLayerRenderer(mapRenderer, tileLayer) {
     WebGLLayerRenderer.call(this, mapRenderer, tileLayer);
     /**
@@ -58636,9 +58433,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * WebGL renderer for vector layers.
  * @api
  */
-var WebGLVectorLayerRenderer =
-/*@__PURE__*/
-function (WebGLLayerRenderer) {
+var WebGLVectorLayerRenderer = /*@__PURE__*/function (WebGLLayerRenderer) {
   function WebGLVectorLayerRenderer(mapRenderer, vectorLayer) {
     WebGLLayerRenderer.call(this, mapRenderer, vectorLayer);
     /**
@@ -59025,9 +58820,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires module:ol/render/Event~RenderEvent#precompose
  * @api
  */
-var WebGLMap =
-/*@__PURE__*/
-function (PluggableMap) {
+var WebGLMap = /*@__PURE__*/function (PluggableMap) {
   function WebGLMap(options) {
     options = (0, _obj.assign)({}, options);
 
@@ -59385,9 +59178,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var TileLayer =
-/*@__PURE__*/
-function (Layer) {
+var TileLayer = /*@__PURE__*/function (Layer) {
   function TileLayer(opt_options) {
     var options = opt_options ? opt_options : {};
     var baseOptions = (0, _obj.assign)({}, options);
@@ -60269,9 +60060,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * See {@link module:ol/source/TileImage~TileImage}.
  *
  */
-var ReprojTile =
-/*@__PURE__*/
-function (Tile) {
+var ReprojTile = /*@__PURE__*/function (Tile) {
   function ReprojTile(sourceProj, sourceTileGrid, targetProj, targetTileGrid, tileCoord, wrappedTileCoord, pixelRatio, gutter, getTileFunction, opt_errorThreshold, opt_renderEdges) {
     Tile.call(this, tileCoord, _TileState.default.IDLE);
     /**
@@ -60589,7 +60378,9 @@ var _TileEventType = _interopRequireDefault(require("./TileEventType.js"));
 
 var _tilecoord = require("../tilecoord.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60622,9 +60413,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @fires import("./Tile.js").TileSourceEvent
  */
-var UrlTile =
-/*@__PURE__*/
-function (TileSource) {
+var UrlTile = /*@__PURE__*/function (TileSource) {
   function UrlTile(options) {
     TileSource.call(this, {
       attributions: options.attributions,
@@ -60905,9 +60694,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires import("./Tile.js").TileSourceEvent
  * @api
  */
-var TileImage =
-/*@__PURE__*/
-function (UrlTile) {
+var TileImage = /*@__PURE__*/function (UrlTile) {
   function TileImage(options) {
     UrlTile.call(this, {
       attributions: options.attributions,
@@ -61367,9 +61154,7 @@ var TOS_ATTRIBUTION = '<a class="ol-attribution-bing-tos" ' + 'href="https://www
  * @api
  */
 
-var BingMaps =
-/*@__PURE__*/
-function (TileImage) {
+var BingMaps = /*@__PURE__*/function (TileImage) {
   function BingMaps(options) {
     var hidpi = options.hidpi !== undefined ? options.hidpi : false;
     TileImage.call(this, {
@@ -61614,9 +61399,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @api
  */
-var XYZ =
-/*@__PURE__*/
-function (TileImage) {
+var XYZ = /*@__PURE__*/function (TileImage) {
   function XYZ(opt_options) {
     var options = opt_options || {};
     var projection = options.projection !== undefined ? options.projection : 'EPSG:3857';
@@ -61708,9 +61491,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Layer source for the CartoDB Maps API.
  * @api
  */
-var CartoDB =
-/*@__PURE__*/
-function (XYZ) {
+var CartoDB = /*@__PURE__*/function (XYZ) {
   function CartoDB(options) {
     XYZ.call(this, {
       attributions: options.attributions,
@@ -61933,9 +61714,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * considered for clustering, a custom `geometryFunction` can be defined.
  * @api
  */
-var Cluster =
-/*@__PURE__*/
-function (VectorSource) {
+var Cluster = /*@__PURE__*/function (VectorSource) {
   function Cluster(options) {
     VectorSource.call(this, {
       attributions: options.attributions,
@@ -62159,9 +61938,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Class encapsulating single reprojected image.
  * See {@link module:ol/source/Image~ImageSource}.
  */
-var ReprojImage =
-/*@__PURE__*/
-function (ImageBase) {
+var ReprojImage = /*@__PURE__*/function (ImageBase) {
   function ReprojImage(sourceProj, targetProj, targetExtent, targetResolution, pixelRatio, getImageFunction) {
     var maxSourceExtent = sourceProj.getExtent();
     var maxTargetExtent = targetProj.getExtent();
@@ -62393,9 +62170,7 @@ var ImageSourceEventType = {
  * type.
  */
 
-var ImageSourceEvent =
-/*@__PURE__*/
-function (Event) {
+var ImageSourceEvent = /*@__PURE__*/function (Event) {
   function ImageSourceEvent(type, image) {
     Event.call(this, type);
     /**
@@ -62430,9 +62205,7 @@ function (Event) {
  */
 
 
-var ImageSource =
-/*@__PURE__*/
-function (Source) {
+var ImageSource = /*@__PURE__*/function (Source) {
   function ImageSource(options) {
     Source.call(this, {
       attributions: options.attributions,
@@ -62643,7 +62416,9 @@ var _Image2 = _interopRequireWildcard(require("./Image.js"));
 
 var _uri = require("../uri.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -62689,9 +62464,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires ol/source/Image~ImageSourceEvent
  * @api
  */
-var ImageArcGISRest =
-/*@__PURE__*/
-function (ImageSource) {
+var ImageArcGISRest = /*@__PURE__*/function (ImageSource) {
   function ImageArcGISRest(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -62974,9 +62747,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Base class for image sources where a canvas element is the image.
  * @api
  */
-var ImageCanvasSource =
-/*@__PURE__*/
-function (ImageSource) {
+var ImageCanvasSource = /*@__PURE__*/function (ImageSource) {
   function ImageCanvasSource(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -63071,7 +62842,9 @@ var _Image2 = _interopRequireWildcard(require("./Image.js"));
 
 var _uri = require("../uri.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63107,9 +62880,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires ol/source/Image~ImageSourceEvent
  * @api
  */
-var ImageMapGuide =
-/*@__PURE__*/
-function (ImageSource) {
+var ImageMapGuide = /*@__PURE__*/function (ImageSource) {
   function ImageMapGuide(options) {
     ImageSource.call(this, {
       projection: options.projection,
@@ -63345,7 +63116,9 @@ var _proj = require("../proj.js");
 
 var _Image2 = _interopRequireWildcard(require("./Image.js"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63374,9 +63147,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * A layer source for displaying a single, static image.
  * @api
  */
-var Static =
-/*@__PURE__*/
-function (ImageSource) {
+var Static = /*@__PURE__*/function (ImageSource) {
   function Static(options) {
     var crossOrigin = options.crossOrigin !== undefined ? options.crossOrigin : null;
     var
@@ -63562,7 +63333,9 @@ var _string = require("../string.js");
 
 var _uri = require("../uri.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63608,9 +63381,7 @@ var GETFEATUREINFO_IMAGE_SIZE = [101, 101];
  * @api
  */
 
-var ImageWMS =
-/*@__PURE__*/
-function (ImageSource) {
+var ImageWMS = /*@__PURE__*/function (ImageSource) {
   function ImageWMS(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -63989,9 +63760,7 @@ var ATTRIBUTION = '&#169; ' + '<a href="https://www.openstreetmap.org/copyright"
 
 exports.ATTRIBUTION = ATTRIBUTION;
 
-var OSM =
-/*@__PURE__*/
-function (XYZ) {
+var OSM = /*@__PURE__*/function (XYZ) {
   function OSM(opt_options) {
     var options = opt_options || {};
     var attributions;
@@ -64379,9 +64148,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires import("../render/Event.js").RenderEvent
  * @api
  */
-var ImageLayer =
-/*@__PURE__*/
-function (Layer) {
+var ImageLayer = /*@__PURE__*/function (Layer) {
   function ImageLayer(opt_options) {
     var options = opt_options ? opt_options : {};
     Layer.call(this, options);
@@ -64511,9 +64278,7 @@ var RasterOperationType = {
  * type.
  */
 
-var RasterSourceEvent =
-/*@__PURE__*/
-function (Event) {
+var RasterSourceEvent = /*@__PURE__*/function (Event) {
   function RasterSourceEvent(type, frameState, data) {
     Event.call(this, type);
     /**
@@ -64576,9 +64341,7 @@ function (Event) {
  */
 
 
-var RasterSource =
-/*@__PURE__*/
-function (ImageSource) {
+var RasterSource = /*@__PURE__*/function (ImageSource) {
   function RasterSource(options) {
     ImageSource.call(this, {
       projection: null
@@ -65116,9 +64879,7 @@ var ProviderConfig = {
  * @api
  */
 
-var Stamen =
-/*@__PURE__*/
-function (XYZ) {
+var Stamen = /*@__PURE__*/function (XYZ) {
   function Stamen(options) {
     var i = options.layer.indexOf('-');
     var provider = i == -1 ? options.layer : options.layer.slice(0, i);
@@ -65224,9 +64985,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * {@link module:ol/source/XYZ~XYZ} data source.
  * @api
  */
-var TileArcGISRest =
-/*@__PURE__*/
-function (TileImage) {
+var TileArcGISRest = /*@__PURE__*/function (TileImage) {
   function TileArcGISRest(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -65416,9 +65175,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/source/TileDebug
  */
-var LabeledTile =
-/*@__PURE__*/
-function (Tile) {
+var LabeledTile = /*@__PURE__*/function (Tile) {
   function LabeledTile(tileCoord, tileSize, text) {
     Tile.call(this, tileCoord, _TileState.default.LOADED);
     /**
@@ -65493,9 +65250,7 @@ function (Tile) {
  */
 
 
-var TileDebug =
-/*@__PURE__*/
-function (TileSource) {
+var TileDebug = /*@__PURE__*/function (TileSource) {
   function TileDebug(options) {
     TileSource.call(this, {
       opaque: false,
@@ -65619,9 +65374,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Layer source for tile data in TileJSON format.
  * @api
  */
-var TileJSON =
-/*@__PURE__*/
-function (TileImage) {
+var TileJSON = /*@__PURE__*/function (TileImage) {
   function TileJSON(options) {
     TileImage.call(this, {
       attributions: options.attributions,
@@ -65858,9 +65611,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Layer source for tile data from WMS servers.
  * @api
  */
-var TileWMS =
-/*@__PURE__*/
-function (TileImage) {
+var TileWMS = /*@__PURE__*/function (TileImage) {
   function TileWMS(opt_options) {
     var options = opt_options ||
     /** @type {Options} */
@@ -66236,9 +65987,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {Array<string>} keys The keys.
  * @property {Object<string, Object>} [data] Optional data.
  */
-var CustomTile =
-/*@__PURE__*/
-function (Tile) {
+var CustomTile = /*@__PURE__*/function (Tile) {
   function CustomTile(tileCoord, state, src, extent, preemptive, jsonp) {
     Tile.call(this, tileCoord, state);
     /**
@@ -66494,9 +66243,7 @@ function (Tile) {
 
 exports.CustomTile = CustomTile;
 
-var UTFGrid =
-/*@__PURE__*/
-function (TileSource) {
+var UTFGrid = /*@__PURE__*/function (TileSource) {
   function UTFGrid(options) {
     TileSource.call(this, {
       projection: (0, _proj.get)('EPSG:3857'),
@@ -66741,7 +66488,9 @@ var _tilecoord = require("../tilecoord.js");
 
 var _tilegrid = require("../tilegrid.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -66810,9 +66559,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @fires import("./Tile.js").TileSourceEvent
  * @api
  */
-var VectorTile =
-/*@__PURE__*/
-function (UrlTile) {
+var VectorTile = /*@__PURE__*/function (UrlTile) {
   function VectorTile(options) {
     var projection = options.projection || 'EPSG:3857';
     var extent = options.extent || (0, _tilegrid.extentFromProjection)(projection);
@@ -67037,9 +66784,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Set the grid pattern for sources accessing WMTS tiled-image servers.
  * @api
  */
-var WMTSTileGrid =
-/*@__PURE__*/
-function (TileGrid) {
+var WMTSTileGrid = /*@__PURE__*/function (TileGrid) {
   function WMTSTileGrid(options) {
     TileGrid.call(this, {
       extent: options.extent,
@@ -67260,9 +67005,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Layer source for tile data from WMTS servers.
  * @api
  */
-var WMTS =
-/*@__PURE__*/
-function (TileImage) {
+var WMTS = /*@__PURE__*/function (TileImage) {
   function WMTS(options) {
     // TODO: add support for TileMatrixLimits
     var requestEncoding = options.requestEncoding !== undefined ?
@@ -67789,9 +67532,7 @@ var TierSizeCalculation = {
   TRUNCATED: 'truncated'
 };
 
-var CustomTile =
-/*@__PURE__*/
-function (ImageTile) {
+var CustomTile = /*@__PURE__*/function (ImageTile) {
   function CustomTile(tileGrid, tileCoord, state, src, crossOrigin, tileLoadFunction, opt_options) {
     ImageTile.call(this, tileCoord, state, src, crossOrigin, tileLoadFunction, opt_options);
     /**
@@ -67885,9 +67626,7 @@ function (ImageTile) {
 
 exports.CustomTile = CustomTile;
 
-var Zoomify =
-/*@__PURE__*/
-function (TileImage) {
+var Zoomify = /*@__PURE__*/function (TileImage) {
   function Zoomify(opt_options) {
     var options = opt_options || {};
     var size = options.size;
@@ -68275,9 +68014,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @module ol/style/IconImage
  */
-var IconImage =
-/*@__PURE__*/
-function (EventTarget) {
+var IconImage = /*@__PURE__*/function (EventTarget) {
   function IconImage(image, src, size, crossOrigin, imageState, color) {
     EventTarget.call(this);
     /**
@@ -68638,9 +68375,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Set icon style for vector features.
  * @api
  */
-var Icon =
-/*@__PURE__*/
-function (ImageStyle) {
+var Icon = /*@__PURE__*/function (ImageStyle) {
   function Icon(opt_options) {
     var options = opt_options || {};
     /**
@@ -69099,9 +68834,7 @@ var DEFAULT_GRADIENT = ['#00f', '#0ff', '#0f0', '#ff0', '#f00'];
  * @api
  */
 
-var Heatmap =
-/*@__PURE__*/
-function (VectorLayer) {
+var Heatmap = /*@__PURE__*/function (VectorLayer) {
   function Heatmap(opt_options) {
     var options = opt_options ? opt_options : {};
     var baseOptions = (0, _obj.assign)({}, options);
@@ -69439,9 +69172,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Options=} opt_options Options.
  * @api
  */
-var VectorTileLayer =
-/*@__PURE__*/
-function (VectorLayer) {
+var VectorTileLayer = /*@__PURE__*/function (VectorLayer) {
   function VectorTileLayer(opt_options) {
     var options = opt_options ? opt_options : {};
     var renderMode = options.renderMode || _VectorTileRenderType.default.HYBRID;
@@ -70562,9 +70293,7 @@ var PARSERS = (0, _xml.makeStructureNS)(NAMESPACE_URIS, {
   'OperationsMetadata': (0, _xml.makeObjectPropertySetter)(readOperationsMetadata)
 });
 
-var OWS =
-/*@__PURE__*/
-function (XML) {
+var OWS = /*@__PURE__*/function (XML) {
   function OWS() {
     XML.call(this);
   }
@@ -70940,9 +70669,7 @@ var PARSERS = (0, _xml.makeStructureNS)(NAMESPACE_URIS, {
  * @api
  */
 
-var WMTSCapabilities =
-/*@__PURE__*/
-function (XML) {
+var WMTSCapabilities = /*@__PURE__*/function (XML) {
   function WMTSCapabilities() {
     XML.call(this);
     /**
@@ -71309,7 +71036,9 @@ var _WMTSCapabilities = _interopRequireDefault(require("ol/format/WMTSCapabiliti
 
 var _WMTS = _interopRequireWildcard(require("ol/source/WMTS"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -71397,39 +71126,7 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml').then(function (r
       // getting feature coordinates (coordinates of pharmacy that's been clicked)
       var coordinates = feature.getGeometry().getCoordinates(); // setting popup window above the clicked pharmacy
 
-      popup.setPosition(coordinates); // getting name, info and other attributes of each pharmacy object, using AJAX
-      // object id in url is got from feature's (marker's) id attribute set earlier
-      // each click on marker sends single GET request for the corresponding object (pharmacy) 
-
-      var pharmacies = data.Wels.folder.items;
-      pharmacies.forEach(function (element) {
-        // creating marker for each pharmacy using their coordinates from json file
-        var marker = new _Feature.default({
-          geometry: new _Point.default(element.geometry.coordinates),
-          id: element.id
-        }); // adding id attribute of every pharmacy store to every marker
-
-        marker.setId(element.id); // creating marker style
-
-        var markerStyle = new _style.Style({
-          image: new _style.Icon({
-            anchor: [0.5, 46],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'pixels',
-            src: 'marker.png'
-          })
-        });
-        marker.setStyle(markerStyle); // adding markers to vector source and then source to the layer
-
-        var vectorSource = new _source.Vector({
-          features: [marker]
-        });
-        var vectorLayer = new _layer.Vector({
-          source: vectorSource,
-          style: markerStyle
-        });
-        map.addLayer(vectorLayer);
-      });
+      popup.setPosition(coordinates);
       fetch("https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&object=".concat(feature.id_)).then(function (response) {
         return response.json();
       }).then(function (data) {
@@ -71461,26 +71158,47 @@ function Module(moduleName) {
 }
 
 module.bundle.Module = Module;
+var checkedAssets, assetsToAccept;
 var parent = module.bundle.parent;
 
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "25054" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51548" + '/');
 
   ws.onmessage = function (event) {
+    checkedAssets = {};
+    assetsToAccept = [];
     var data = JSON.parse(event.data);
 
     if (data.type === 'update') {
-      console.clear();
-      data.assets.forEach(function (asset) {
-        hmrApply(global.parcelRequire, asset);
-      });
+      var handled = false;
       data.assets.forEach(function (asset) {
         if (!asset.isNew) {
-          hmrAccept(global.parcelRequire, asset.id);
+          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
+
+          if (didAccept) {
+            handled = true;
+          }
         }
+      }); // Enable HMR for CSS by default.
+
+      handled = handled || data.assets.every(function (asset) {
+        return asset.type === 'css' && asset.generated.js;
       });
+
+      if (handled) {
+        console.clear();
+        data.assets.forEach(function (asset) {
+          hmrApply(global.parcelRequire, asset);
+        });
+        assetsToAccept.forEach(function (v) {
+          hmrAcceptRun(v[0], v[1]);
+        });
+      } else if (location.reload) {
+        // `location` global exists in a web worker context but lacks `.reload()` function.
+        location.reload();
+      }
     }
 
     if (data.type === 'reload') {
@@ -71568,7 +71286,7 @@ function hmrApply(bundle, asset) {
   }
 }
 
-function hmrAccept(bundle, id) {
+function hmrAcceptCheck(bundle, id) {
   var modules = bundle.modules;
 
   if (!modules) {
@@ -71576,9 +71294,27 @@ function hmrAccept(bundle, id) {
   }
 
   if (!modules[id] && bundle.parent) {
-    return hmrAccept(bundle.parent, id);
+    return hmrAcceptCheck(bundle.parent, id);
   }
 
+  if (checkedAssets[id]) {
+    return;
+  }
+
+  checkedAssets[id] = true;
+  var cached = bundle.cache[id];
+  assetsToAccept.push([bundle, id]);
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    return true;
+  }
+
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAcceptCheck(global.parcelRequire, id);
+  });
+}
+
+function hmrAcceptRun(bundle, id) {
   var cached = bundle.cache[id];
   bundle.hotData = {};
 
@@ -71603,10 +71339,6 @@ function hmrAccept(bundle, id) {
 
     return true;
   }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAccept(global.parcelRequire, id);
-  });
 }
 },{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=/wels-apotheken-map.e31bb0bc.map
+//# sourceMappingURL=/wels-apotheken-map.e31bb0bc.js.map

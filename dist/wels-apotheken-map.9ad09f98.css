@@ -38,4 +38,7 @@
 }
 #popup-closer:after {
   content: "✖";
+  cursor: pointer;
 }
+
+/*# sourceMappingURL=/wels-apotheken-map.9ad09f98.css.map */

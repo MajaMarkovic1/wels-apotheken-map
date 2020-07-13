@@ -67,7 +67,7 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml')
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
             src: 'marker.png'
-          }))
+          })),
         });
         marker.setStyle(markerStyle);
     
@@ -106,40 +106,8 @@ fetch('https://www.wels.gv.at/wmts/1.0.0/WMTSCapabilities.xml')
         let coordinates = feature.getGeometry().getCoordinates();
         // setting popup window above the clicked pharmacy
         popup.setPosition(coordinates);
-        // getting name, info and other attributes of each pharmacy object, using AJAX
-        // object id in url is got from feature's (marker's) id attribute set earlier
-        // each click on marker sends single GET request for the corresponding object (pharmacy) 
-         let pharmacies = data.Wels.folder.items;
-          pharmacies.forEach(element => {
-            // creating marker for each pharmacy using their coordinates from json file
-            let marker = new Feature({
-              geometry: new Point(element.geometry.coordinates),
-              id: element.id
-            });
-            // adding id attribute of every pharmacy store to every marker
-            marker.setId(element.id);
-
-            // creating marker style
-            let markerStyle = new Style({
-              image: new Icon( ({
-                anchor: [0.5, 46],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'pixels',
-                src: 'marker.png'
-              }))
-            });
-            marker.setStyle(markerStyle);
-        
-            // adding markers to vector source and then source to the layer
-            let vectorSource = new VectorSource({
-                features: [marker]
-              });
-            let vectorLayer = new VectorLayer({
-                source: vectorSource,
-                style: markerStyle
-            });
-            map.addLayer(vectorLayer);
-        });
+   
+   
         fetch(`https://admin.map2web.eu/api/?key=44ce13e8d517e0f931492a8c8f641259b14f6c21&object=${feature.id_}`)
         .then(function(response) {
           return response.json();
